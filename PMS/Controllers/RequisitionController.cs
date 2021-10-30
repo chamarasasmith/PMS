@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using PMS.Data;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
@@ -21,11 +22,23 @@ namespace PMS.Controllers
 
         // GET: api/values
         [HttpGet]
-        public IEnumerable<PurchaseRequisition> Get()
+        public IEnumerable<dynamic> Get()
         {
             try
             {
-                return context?.PurchaseRequisition?.Where(a => a.Status == 1)?.ToList();
+                var obj1 = context?.PurchaseRequisition?.Include(a => a.Item)?.Include(a => a.Item != null ? a.Item.Supplier : null)?.Include(b => b.Location)?.Where(a => a.Status == 1)?.Include(a=>a.CreatedBy)?.ToList()?.Select(a => new
+                {
+                    a.PurchaseRequisitionID,
+                    a.ItemID,
+                    ItemName = a.Item?.Name?.Trim() ?? "",
+                    a.Quantity,
+                    CreatedBy = a.CreatedBy?.Name?.Trim() ?? "",
+                    MeasureType = a.Item?.MeasureType?.Trim() ?? "",
+                    Supplier = a.Item?.Supplier?.Name?.Trim() ?? "",
+                    Location = a.Location?.Name?.Trim() ?? "",
+                    CreatedDate = a.CreatedDate.ToString("yyyy-MM-dd") ?? "",
+                });
+                return obj1;
             }
             catch (Exception)
             {
