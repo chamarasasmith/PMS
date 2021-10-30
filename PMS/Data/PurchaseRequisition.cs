@@ -14,7 +14,6 @@ namespace PMS.Data
          
         public User CreatedBy { get; set; }
         public Item Item { get; set; }
-        public Location Location { get; set; }
-        /////////////////
+        public Location Location { get; set; } 
     }
 }
